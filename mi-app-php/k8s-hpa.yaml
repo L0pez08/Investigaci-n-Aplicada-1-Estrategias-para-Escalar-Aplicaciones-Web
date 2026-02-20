@@ -1,0 +1,18 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: mi-app-php-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mi-app-php-deployment # Se conecta al deployment que creamos arriba
+  minReplicas: 2 # Mínimo las 2 réplicas que pide la rúbrica
+  maxReplicas: 5 # Si hay mucho tráfico, puede crecer hasta 5 réplicas
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50 # Si la CPU pasa del 50%, K8s crea otra réplica automáticamente

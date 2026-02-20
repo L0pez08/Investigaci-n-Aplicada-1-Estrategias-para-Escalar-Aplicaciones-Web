@@ -1,0 +1,36 @@
+# --- PARTE 1: EL DEPLOYMENT (Las réplicas) ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mi-app-php-deployment
+spec:
+  replicas: 2 # ¡Aquí cumplimos el requisito de tener al menos 2 réplicas!
+  selector:
+    matchLabels:
+      app: mi-app-php
+  template:
+    metadata:
+      labels:
+        app: mi-app-php
+    spec:
+      containers:
+      - name: mi-app-php-contenedor
+        image: tu-usuario-docker/mi-app-php:v1 # Aquí iría el nombre de tu imagen Docker
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m" # Esto es OBLIGATORIO ponerlo para que el autoescalado (HPA) funcione después
+---
+# --- PARTE 2: EL BALANCEADOR DE CARGA (LoadBalancer) ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mi-app-php-servicio
+spec:
+  type: LoadBalancer # ¡Aquí cumplimos el requisito del balanceador de carga!
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: mi-app-php
